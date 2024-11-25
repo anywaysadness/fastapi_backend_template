@@ -1,0 +1,60 @@
+[tool.poetry]
+name = "fastapi-backend-template"
+version = "0.1.0"
+description = ""
+authors = ["Курдюмов Максим Олегович <dfrozzze@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.8.0"
+pre-commit = "^4.0.1"
+mypy = "^1.13.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.ruff]
+line-length = 135
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+target-version = "py311"
+select = [
+    "E", # pycodestyle
+    "F", # pyflakes
+    "UP", # pyupgrade
+    "I",
+]
+ignore = ["F401", "E712"]
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+    "seed_data",
+]
+
+[tool.ruff.pydocstyle]
+convention = "google"

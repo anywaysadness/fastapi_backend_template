@@ -1,0 +1,45 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: check-yaml
+      - id: debug-statements
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+
+  - repo: local
+    hooks:
+      - id: black
+        name: black
+        entry: black
+        language: system
+        types: [python]
+
+      - id: mypy
+        name: mypy
+        entry: ./.venv/bin/mypy --config-file mypy.ini
+        language: system
+        types: [python]
+        pass_filenames: true
+
+      - id: ruff
+        name: ruff
+        description: "fast Python linting"
+        entry: ./.venv/bin/ruff check --force-exclude
+        language: python
+        types_or: [python, pyi]
+        args: []
+        require_serial: true
+        additional_dependencies: []
+        minimum_pre_commit_version: "2.9.2"
+
+      - id: ruff-format
+        name: ruff-format
+        description: "fast Python formatting"
+        entry: ./.venv/bin/ruff format --force-exclude
+        language: python
+        types_or: [python, pyi]
+        args: []
+        require_serial: true
+        additional_dependencies: []
+        minimum_pre_commit_version: "2.9.2"
