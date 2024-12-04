@@ -59,3 +59,20 @@ exclude = [
 
 [tool.ruff.pydocstyle]
 convention = "google"
+
+[tool.mypy]
+files = "src/"
+follow_imports = "skip"
+python_version = "3.11"
+strict_optional = false
+
+ignore_missing_imports = true
+disallow_untyped_calls = true
+disallow_untyped_defs = false
+disallow_subclassing_any = false
+disallow_untyped_decorators = false
+
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_unused_configs = true
+unknown_option = true
