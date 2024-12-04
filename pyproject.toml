@@ -61,7 +61,7 @@ exclude = [
 convention = "google"
 
 [tool.mypy]
-files = "src/"
+files = ["src/"]
 follow_imports = "skip"
 python_version = "3.11"
 strict_optional = false

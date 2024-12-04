@@ -1,14 +1,14 @@
 {
-    "files.autoSave": "afterDelay",
-    "files.autoSaveDelay": 1000,
-    "editor.formatOnSave": true,
+    "files.autoSave": "afterDelay", // Автосохранение через
+    "files.autoSaveDelay": 1000, // 1 секунду
+    "editor.formatOnSave": true, // Автоматически форматировать при сохранении
     "[python]": {
         "editor.formatOnSave": true,
         "editor.codeActionsOnSave": {
-            "source.fixAll": "explicit",
-            "source.organizeImports.ruff": "explicit"
+            "source.fixAll": "explicit", // Исправить все возможные проблемы через ruff
+            "source.organizeImports.ruff": "explicit" // упорядочивание импортов через ruff
         },
-        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.defaultFormatter": "charliermarsh.ruff", // ФОрматировщик по умолчанию
     },
     "ruff.lint.args": [
         "--config=pyproject.toml"
@@ -19,10 +19,4 @@
     "ruff.path": [
         "./.venv/bin/ruff" // TODO
     ],
-    "mypy.configFile": "pyproject.toml", // Указание файла конфигурации
-    "mypy.targets": [
-        "src/" // Указание папки, которую анализирует MyPy
-    ],
-    "python.linting.enabled": true, // Включаем линтинг
-    "python.linting.mypyEnabled": true // Включаем MyPy как линтер
 }
