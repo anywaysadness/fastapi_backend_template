@@ -14,7 +14,7 @@ start: venv
 
 ## Поднятие контейнеров Docker
 up:
-    @echo "Поднятие контейнеров Docker..."
+	@echo "Поднятие контейнеров Docker..."
 	$(DOCKER_COMPOSE) up -d
 	
 ## Остановка контейнеров Docker
