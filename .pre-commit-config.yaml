@@ -5,22 +5,12 @@ repos:
         name: ruff
         description: "Lint and fix Python code"
         entry: poetry run ruff check --fix --force-exclude
-        language: python
-        language_version: python3.11
+        language: system
         types_or: [python]
 
       - id: ruff-format
         name: ruff-format
         description: "Format Python code"
         entry: poetry run ruff format --force-exclude
-        language: python
-        language_version: python3.11
+        language: system
         types_or: [python]
-      
-      - id: mypy
-        name: mypy
-        entry: poetry run mypy --config-file mypy.ini
-        language: python
-        language_version: python3.11
-        types: [python]
-        pass_filenames: true
