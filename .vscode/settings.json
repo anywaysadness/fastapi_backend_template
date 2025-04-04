@@ -1,7 +1,6 @@
 {
     "files.autoSave": "afterDelay", // Автосохранение через
     "files.autoSaveDelay": 1000, // 1 секунду
-    "editor.formatOnSave": true, // Автоматически форматировать при сохранении
     "[python]": {
         "editor.formatOnSave": true,
         "editor.codeActionsOnSave": {
@@ -10,13 +9,10 @@
         },
         "editor.defaultFormatter": "charliermarsh.ruff", // ФОрматировщик по умолчанию
     },
-    "ruff.lint.args": [
-        "--config=pyproject.toml"
-    ],
     "ruff.interpreter": [
-        "./.venv/bin/python3.11" // TODO
+        ".venv\\Scripts\\python.exe"
     ],
     "ruff.path": [
-        "./.venv/bin/ruff" // TODO
+        ".venv\\Scripts\\ruff.exe"
     ],
 }
