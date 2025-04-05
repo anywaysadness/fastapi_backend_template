@@ -1,4 +1,5 @@
 import sys
+from collections.abc import Callable
 from subprocess import run
 
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
@@ -14,7 +15,7 @@ engine = create_async_engine(
 )
 
 # Фабрика сессий для работы с базой данных
-async_session_maker = sessionmaker(
+async_session_maker: Callable[..., AsyncSession] = sessionmaker(
     bind=engine,
     class_=AsyncSession,
     expire_on_commit=False,  # Не истекать объекты после коммита
