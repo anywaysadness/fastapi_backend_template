@@ -1,3 +1,5 @@
+import logging
+
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
 from redis.asyncio import Redis as redis_async
@@ -51,11 +53,39 @@ class AppConfig(BaseSettings):
     app_env: str = "development"
     app_debug: bool = True
 
+    def get_app_settings(self):
+        if self.app_env == "production":
+            return {
+                "prefix": "api",
+                "enable_dev": False,
+                "log_level": logging.WARNING,
+            }
+        elif self.app_env == "development":
+            return {
+                "prefix": "dev",
+                "enable_dev": True,
+                "log_level": logging.INFO,
+            }
+        else:
+            return {
+                "prefix": "dev",
+                "enable_dev": True,
+                "log_level": logging.INFO,
+            }
+
+
+class JWTAuth(BaseSettings):
+    SECRET_KEY: str
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 3
+    ALGORITHM: str = "HS256"
+
 
 class Configuration:
     postgres_conf = PostgresConfig()
     redis_conf = RedisConfig()
     app_conf = AppConfig()
+    jwt_auth = JWTAuth()
 
 
 conf = Configuration()

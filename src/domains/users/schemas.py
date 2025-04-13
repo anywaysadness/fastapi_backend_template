@@ -1,4 +1,4 @@
-from typing import Annotated
+from datetime import datetime
 
 from pydantic import EmailStr
 
@@ -9,17 +9,18 @@ class UserSchema(BaseSchema):
     id: int
     username: str
     hashed_password: bytes
+    created_at: datetime
     email: EmailStr | None = None
     is_active: bool = True
+    is_admin: bool = False
 
 
-class CreateUserSchema(BaseSchema):
+class BaseUserSchema(BaseSchema):
     username: str
     password: str
 
 
-class UpdateUserSchema(BaseSchema):
-    username: str
-    password: bytes
+class UpdateUserSchema(BaseUserSchema):
     email: EmailStr | None = None
     is_active: bool = True
+    is_admin: bool = False

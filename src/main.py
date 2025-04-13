@@ -9,31 +9,6 @@ from src.routers import all_routers
 logger = logging.getLogger(__name__)
 
 
-# Определение настроек приложения
-def get_app_settings():
-    """
-    Возвращает настройки приложения в зависимости от окружения.
-    """
-    if conf.app_conf.app_env == "production":
-        return {
-            "prefix": "api",
-            "enable_dev": False,
-            "log_level": logging.WARNING,
-        }
-    elif conf.app_conf.app_env == "development":
-        return {
-            "prefix": "dev",
-            "enable_dev": True,
-            "log_level": logging.INFO,
-        }
-    else:
-        return {
-            "prefix": "dev",
-            "enable_dev": True,
-            "log_level": logging.INFO,
-        }
-
-
 # Жизненный цикл приложения
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -43,7 +18,7 @@ async def lifespan(app: FastAPI):
 
 
 # Настройки маршрутизации
-app_settings = get_app_settings()
+app_settings = conf.app_conf.get_app_settings()
 api_router = APIRouter(
     prefix=f"/{app_settings['prefix']}",
     responses={404: {"description": "Page not found"}},
