@@ -11,6 +11,8 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
     username: Mapped[str] = mapped_column(sa.String(length=128), unique=True, nullable=False)
-    hashed_password: Mapped[str] = mapped_column(sa.String, nullable=True)
+    hashed_password: Mapped[str] = mapped_column(sa.String, nullable=False)
+    email: Mapped[str] = mapped_column(sa.String(512), unique=True, nullable=True)
     created_at: Mapped[datetime] = mapped_column(sa.DateTime(timezone=True), default=datetime.now(UTC))
-    is_active: Mapped[bool] = mapped_column(sa.Boolean, default=True)
+    is_active: Mapped[bool] = mapped_column(sa.Boolean, nullable=True, default=True)
+    is_admin: Mapped[bool] = mapped_column(sa.Boolean, nullable=True, default=False)
