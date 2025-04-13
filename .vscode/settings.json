@@ -10,9 +10,9 @@
         "editor.defaultFormatter": "charliermarsh.ruff", // ФОрматировщик по умолчанию
     },
     "ruff.interpreter": [
-        "/mnt/e/fastapi_backend_template/.venv/bin/python"
+        "/home/anyway/projects/fastapi_backend_template/.venv/bin/python"
     ],
     "ruff.path": [
-        "/mnt/e/fastapi_backend_template/.venv/bin/ruff"
+        "/home/anyway/projects/fastapi_backend_template/.venv/bin/ruff"
     ],
 }

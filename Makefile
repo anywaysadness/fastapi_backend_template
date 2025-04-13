@@ -22,4 +22,14 @@ down:
 	@echo "Остановка контейнеров Docker..."
 	$(DOCKER_COMPOSE) down
 
+## Прогонка миграций alembic
+migrate:
+	@echo "Прогонка миграций alembic..."
+	poetry run alembic revision --autogenerate -m "${NAME}"
+	
+## Обновление БД alembic
+upgrade:
+	@echo "Обновление БД alembic..."
+	poetry run alembic upgrade head
+
 .PHONY: start venv clean
