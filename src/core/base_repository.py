@@ -49,7 +49,7 @@ class SQLAlchemyRepository(AbstractRepository[T]):
         async with async_session_maker() as session:
             stmt = select(self.model).where(self.model.id == id)
             res = await session.execute(stmt)
-            return res.scalar_one()
+            return res.scalar_one_or_none()
 
     async def find_all(self):
         async with async_session_maker() as session:

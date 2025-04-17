@@ -1,6 +1,6 @@
-from src.core.base_schema import BaseSchema
+from src.core.base_schemas import BaseSchema
 
 
 class TokenInfo(BaseSchema):
     access_token: str
-    token_type: str
+    refresh_token: str | None = None

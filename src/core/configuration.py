@@ -76,9 +76,13 @@ class AppConfig(BaseSettings):
 
 class JWTAuth(BaseSettings):
     SECRET_KEY: str
+    COOKIE_KEY: str = "_auth_token"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
-    REFRESH_TOKEN_EXPIRE_DAYS: int = 3
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 6
     ALGORITHM: str = "HS256"
+    TOKEN_TYPE_FIELD: str = "type"
+    ACCESS_TOKEN_TYPE: str = "access"
+    REFRESH_TOKEN_TYPE: str = "refresh"
 
 
 class Configuration:

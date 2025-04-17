@@ -3,7 +3,7 @@ from fastapi import HTTPException, status
 
 class InvalidTokenException(HTTPException):
     def __init__(self):
-        super().__init__(status_code=401, detail="Не валидный токен")
+        super().__init__(status_code=401, detail="Токен не валиден")
 
 
 class InvalidCredentialsException(HTTPException):
@@ -23,12 +23,12 @@ class UserDoesNotExist(HTTPException):
 
 class UserNotActiveException(HTTPException):
     def __init__(self):
-        super().__init__(status_code=403, detail="Аккаунт не активен")
+        super().__init__(status_code=403, detail="Пользователь не активен")
 
 
 class UserNotAdminException(HTTPException):
     def __init__(self):
-        super().__init__(status_code=403, detail="Недостаточно прав. Пользователь не админ")
+        super().__init__(status_code=403, detail="Недостаточно прав для выполнения")
 
 
 class UserNotAuthorizedException(HTTPException):
@@ -38,12 +38,16 @@ class UserNotAuthorizedException(HTTPException):
 
 class UserNotFoundException(HTTPException):
     def __init__(self):
-        super().__init__(status_code=404, detail="Не найден пользователь")
+        super().__init__(status_code=404, detail="Пользователь не найден")
 
 
 AUTH_EXEPTIONS: tuple = (
-    UserNotAdminException,
-    UserNotActiveException,
-    UserNotAuthorizedException,
     InvalidTokenException,
+    InvalidCredentialsException,
+    UserAlreadyExistsException,
+    UserDoesNotExist,
+    UserNotActiveException,
+    UserNotAdminException,
+    UserNotAuthorizedException,
+    UserNotFoundException,
 )

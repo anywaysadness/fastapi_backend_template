@@ -1,43 +1,34 @@
-import json
 import logging
-import os
-from logging.handlers import RotatingFileHandler, SysLogHandler
 
-from .configuration import conf
+from colorlog import ColoredFormatter
 
-json_formatter = logging.Formatter(
-    json.dumps(
-        {
-            "process_id": "%(process)d",
-            "time": "%(asctime)s",
-            "level": "%(levelname)-6s",
-            "loggerName": "%(name)s",
-            "funcName": "%(funcName)s()",
-            "line": "%(pathname)s:%(lineno)d",
-            "message": "%(message)s",
+
+def configure_logging(level=logging.INFO):
+    # Создаем логгер
+    logger = logging.getLogger()
+    logger.setLevel(level)
+
+    # Создаем обработчик для вывода в консоль
+    console_handler = logging.StreamHandler()
+
+    # Определяем цветной форматтер
+    formatter = ColoredFormatter(
+        "%(log_color)s[%(asctime)s.%(msecs)03d] %(module)30s:%(lineno)-4d %(levelname)7s%(reset)s - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+        reset=True,
+        log_colors={
+            "DEBUG": "cyan",  # Голубой для DEBUG
+            "INFO": "green",  # Зеленый для INFO
+            "WARNING": "yellow",  # Желтый для WARNING
+            "ERROR": "red",  # Красный для ERROR
+            "CRITICAL": "bold_red",  # Жирный красный для CRITICAL
         },
+        secondary_log_colors={},
+        style="%",
     )
-)
 
-ch: logging.StreamHandler | RotatingFileHandler | SysLogHandler | None = None
-if conf.log.handler == "stdout":
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.NOTSET)
-    ch.setFormatter(json_formatter)
-elif conf.log.handler == "file":
-    if not os.path.exists("/var/log/spacesan"):
-        os.mkdir("/var/log/spacesan")
-    ch = RotatingFileHandler(
-        filename="/var/log/spacesan/spsan.log" if conf.log.path is None else conf.log.path,
-        maxBytes=500_000_000,  # 500MB
-        backupCount=10,
-        encoding="utf8",
-    )
-    ch.setLevel(logging.NOTSET)
-    ch.setFormatter(json_formatter)
-elif conf.log.handler == "syslog":
-    ch = SysLogHandler(address=("127.0.0.1", 514) if conf.log.path is None else conf.log.path)
-    ch.setLevel(logging.NOTSET)
-    ch.setFormatter(json_formatter)
-else:
-    raise Exception
+    # Применяем форматтер к обработчику
+    console_handler.setFormatter(formatter)
+
+    # Добавляем обработчик к логгеру
+    logger.addHandler(console_handler)

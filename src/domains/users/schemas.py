@@ -2,7 +2,7 @@ from datetime import datetime
 
 from pydantic import EmailStr
 
-from src.core.base_schema import BaseSchema
+from src.core.base_schemas import BaseSchema
 
 
 class UserSchema(BaseSchema):

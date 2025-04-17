@@ -4,21 +4,25 @@ from contextlib import asynccontextmanager
 from fastapi import APIRouter, FastAPI
 
 from src.core.configuration import conf
+from src.core.logging_conf import configure_logging
 from src.routers import all_routers
 
 logger = logging.getLogger(__name__)
+
+app_settings = conf.app_conf.get_app_settings()
 
 
 # Жизненный цикл приложения
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("startup completed")
+    configure_logging(level=logging.INFO)
+    logger.info("Приложение запущено")
     yield
-    logger.info("Shutdown completed")
+    logger.info("Приложение завершено")
 
 
 # Настройки маршрутизации
-app_settings = conf.app_conf.get_app_settings()
+
 api_router = APIRouter(
     prefix=f"/{app_settings['prefix']}",
     responses={404: {"description": "Page not found"}},
