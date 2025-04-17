@@ -60,6 +60,5 @@ test_capi
 
 !*.gitkeep
 *.log
-docker-compose.yml
 celery.sh
 flower.sh
