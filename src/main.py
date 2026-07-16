@@ -3,20 +3,22 @@ from contextlib import asynccontextmanager
 
 from fastapi import APIRouter, FastAPI
 
-from src.core.configuration import conf
-from src.core.logging_conf import configure_logging
+from src.common.configuration import conf
+from src.common.logging_conf import configure_logging
+from src.infrastructure.database.connection import migrate
 from src.routers import all_routers
 
 logger = logging.getLogger(__name__)
 
-app_settings = conf.app_conf.get_app_settings()
+app_settings = conf.app.get_app_settings()
 
 
 # Жизненный цикл приложения
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    configure_logging(level=logging.INFO)
-    logger.info("Приложение запущено")
+    configure_logging(level=app_settings["log_level"])
+    await migrate()
+    logger.info(f"Приложение запущено в '{conf.app.ENV}' режиме")
     yield
     logger.info("Приложение завершено")
 
