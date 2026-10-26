@@ -1,5 +1,5 @@
-from src.presentation.user.auth_router import auth_router
+from src.presentation.v1 import api_router
 
 all_routers = [
-    auth_router,
+    api_router,
 ]
