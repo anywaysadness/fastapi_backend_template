@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Poetry
+        run: pipx install poetry==2.5.1
+
+      - name: Install dependencies
+        run: poetry install --no-interaction
+
+      - name: Check lock file
+        run: poetry check --lock
+
+      - name: Lint
+        run: poetry run ruff check src tests migrations
+
+      - name: Check formatting
+        run: poetry run ruff format --check src tests migrations
+
+      - name: Typecheck
+        run: poetry run mypy src tests
+
+      - name: Test
+        run: poetry run pytest -q
