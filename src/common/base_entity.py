@@ -2,4 +2,4 @@ from abc import ABC
 
 
 class BaseEntity(ABC):
-    pass
+    """Базовый класс доменной сущности."""

@@ -1,52 +1,63 @@
 import asyncio
 import logging
 import sys
-from collections.abc import Callable
-from subprocess import PIPE, run
+from pathlib import Path
 
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.ext.asyncio.engine import AsyncEngine
 
 from src.common.configuration import conf
 
-# Создание асинхронного движка
+logger = logging.getLogger(__name__)
+
 engine: AsyncEngine = create_async_engine(
     url=conf.postgres.build_connection_str(),
-    echo=conf.app.DEBUG,  # Вывод SQL-запросов в консоль (только в режиме отладки)
-    pool_pre_ping=True,  # Автоматическая проверка соединений в пуле
+    echo=conf.app.DEBUG,
+    pool_pre_ping=True,
 )
 
-# Фабрика сессий для работы с базой данных
-async_session_maker: Callable[..., AsyncSession] = async_sessionmaker(
+async_session_maker: async_sessionmaker[AsyncSession] = async_sessionmaker(
     bind=engine,
     class_=AsyncSession,
-    expire_on_commit=False,  # Не истекать объекты после коммита
+    expire_on_commit=False,
 )
 
 
-async def get_async_session():
-    async with async_session_maker() as session:
-        yield session
+async def migrate(timeout: float = 120.0) -> None:
+    """Применяет миграции Alembic без блокировки event loop."""
+    process = await asyncio.create_subprocess_exec(
+        sys.executable,
+        "-m",
+        "alembic",
+        "upgrade",
+        "head",
+        cwd=Path(__file__).resolve().parents[3],
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+
+    try:
+        stdout, stderr = await asyncio.wait_for(process.communicate(), timeout=timeout)
+    except TimeoutError:
+        process.kill()
+        await process.communicate()
+        raise RuntimeError(f"Alembic migration timed out after {timeout} seconds") from None
+
+    if process.returncode != 0:
+        error = stderr.decode(errors="replace").strip() or stdout.decode(errors="replace").strip()
+        logger.error("Alembic migration failed: %s", error)
+        raise RuntimeError("Alembic migration failed")
+
+    logger.info("Database migrations applied")
 
 
-async def migrate(retry_delay: float = 5.0) -> None:
-    """Бесконечно пытается применить миграции Alembic до успеха."""
-    attempt = 0
-    while True:
-        attempt += 1
-        try:
-            run(
-                [sys.executable, "-m", "alembic", "upgrade", "head"],
-                check=True,
-                capture_output=True,
-            )
-            logging.debug("Миграции БД успешно применены")
-            return
-        except Exception as e:
-            logging.warning(
-                "Сбой миграции БД (попытка %d): %s. Повтор через %.1f сек.",
-                attempt,
-                e,
-                retry_delay,
-            )
-            await asyncio.sleep(retry_delay)
+async def check_database() -> None:
+    """Проверяет доступность PostgreSQL."""
+    async with engine.connect() as connection:
+        await connection.execute(text("SELECT 1"))
+
+
+async def close_database() -> None:
+    """Закрывает пул соединений SQLAlchemy."""
+    await engine.dispose()

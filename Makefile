@@ -5,10 +5,14 @@ VENV = .venv
 APP_DIR = src
 HOST = 0.0.0.0
 PORT = 8000
-DOCKER_COMPOSE = docker-compose
+DOCKER_COMPOSE = docker compose
+
+## Установка зависимостей
+install:
+	poetry install
 
 ## Запуск FastAPI приложения
-start: venv
+start:
 	@echo "Запуск FastAPI приложения..."
 	$(VENV)/bin/uvicorn $(APP_DIR).main:app --host $(HOST) --port $(PORT) --reload
 
@@ -16,20 +20,32 @@ start: venv
 up:
 	@echo "Поднятие контейнеров Docker..."
 	$(DOCKER_COMPOSE) up -d
-	
+
 ## Остановка контейнеров Docker
 down:
 	@echo "Остановка контейнеров Docker..."
 	$(DOCKER_COMPOSE) down
 
-## Прогонка миграций alembic
+## Создание новой миграции
 migrate:
-	@echo "Прогонка миграций alembic..."
+	@echo "Создание миграции alembic..."
 	poetry run alembic revision --autogenerate -m "${NAME}"
-	
-## Обновление БД alembic
+
+## Применение миграций
 upgrade:
-	@echo "Обновление БД alembic..."
+	@echo "Применение миграций alembic..."
 	poetry run alembic upgrade head
 
-.PHONY: start venv clean
+## Линтинг
+lint:
+	poetry run ruff check src tests migrations
+
+## Проверка типов
+typecheck:
+	poetry run mypy src tests
+
+## Тесты
+test:
+	poetry run pytest
+
+.PHONY: install start up down migrate upgrade lint typecheck test

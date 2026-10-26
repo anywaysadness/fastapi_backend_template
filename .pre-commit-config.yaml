@@ -14,3 +14,11 @@ repos:
         entry: poetry run ruff format --force-exclude
         language: system
         types_or: [python]
+
+      - id: mypy
+        name: mypy
+        description: "Type-check the project"
+        entry: poetry run mypy src tests
+        language: system
+        types_or: [python]
+        pass_filenames: false

@@ -1,34 +1,22 @@
 import logging
 
-from colorlog import ColoredFormatter
 
+def configure_logging(level: int | str = logging.INFO) -> None:
+    """Настраивает корневой логгер идемпотентно.
 
-def configure_logging(level=logging.INFO):
-    # Создаем логгер
-    logger = logging.getLogger()
-    logger.setLevel(level)
+    Повторный вызов заменяет обработчики, не дублируя вывод.
+    """
+    root_logger = logging.getLogger()
+    root_logger.setLevel(level)
 
-    # Создаем обработчик для вывода в консоль
+    for handler in list(root_logger.handlers):
+        root_logger.removeHandler(handler)
+
     console_handler = logging.StreamHandler()
-
-    # Определяем цветной форматтер
-    formatter = ColoredFormatter(
-        "%(log_color)s[%(asctime)s.%(msecs)03d] %(module)30s:%(lineno)-4d %(levelname)7s%(reset)s - %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-        reset=True,
-        log_colors={
-            "DEBUG": "cyan",  # Голубой для DEBUG
-            "INFO": "green",  # Зеленый для INFO
-            "WARNING": "yellow",  # Желтый для WARNING
-            "ERROR": "red",  # Красный для ERROR
-            "CRITICAL": "bold_red",  # Жирный красный для CRITICAL
-        },
-        secondary_log_colors={},
-        style="%",
+    console_handler.setFormatter(
+        logging.Formatter(
+            "%(asctime)s.%(msecs)03d %(levelname)s %(name)s:%(lineno)d - %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S",
+        )
     )
-
-    # Применяем форматтер к обработчику
-    console_handler.setFormatter(formatter)
-
-    # Добавляем обработчик к логгеру
-    logger.addHandler(console_handler)
+    root_logger.addHandler(console_handler)

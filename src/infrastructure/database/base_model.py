@@ -1,6 +1,5 @@
 from sqlalchemy import MetaData
-from sqlalchemy.ext.declarative import as_declarative
-from sqlalchemy.orm import declared_attr
+from sqlalchemy.orm import as_declarative, declared_attr
 
 from src.common.configuration import conf
 
@@ -11,9 +10,12 @@ metadata = MetaData(
 
 @as_declarative(metadata=metadata)
 class Base:
+    """Базовый класс SQLAlchemy-моделей с naming convention."""
+
     @classmethod
     @declared_attr
     def __tablename__(cls):
+        """Возвращает имя таблицы по имени модели."""
         return cls.__name__.lower()
 
     __allow_unmapped__ = False
