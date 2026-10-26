@@ -7,14 +7,17 @@ from src.domains.users.exceptions import InvalidEmailError
 
 @dataclass(frozen=True)
 class EmailVO(BaseValueObject[str]):
-    """email пользователя"""
+    """Email пользователя."""
 
     value: str
 
     _EMAIL_PATTERN = re.compile(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
 
     def __post_init__(self) -> None:
+        """Нормализует и проверяет email."""
         normalized = self.value.strip().lower()
 
-        if not self._EMAIL_PATTERN.match(normalized):
+        if len(normalized) > 512 or not self._EMAIL_PATTERN.fullmatch(normalized):
             raise InvalidEmailError(normalized)
+
+        object.__setattr__(self, "value", normalized)
