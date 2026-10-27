@@ -19,6 +19,8 @@
 
 ## Запуск
 
+Требуются Python 3.14+ и Poetry 2.x.
+
 ```bash
 cp .env.example .env
 poetry install

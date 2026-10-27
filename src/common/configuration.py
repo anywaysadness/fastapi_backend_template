@@ -1,4 +1,4 @@
-from typing import ClassVar, Literal
+from typing import ClassVar, Literal, Self
 from urllib.parse import quote
 
 from pydantic import Field, SecretStr, model_validator
@@ -86,7 +86,7 @@ class AppConfig(BaseSettings):
         return self.ENV == "development"
 
     @model_validator(mode="after")
-    def validate_http_settings(self) -> "AppConfig":
+    def validate_http_settings(self) -> Self:
         """Проверяет безопасность CORS и cookie-настроек."""
         if "*" in self.CORS_ORIGINS:
             raise ValueError("CORS_ORIGINS must contain explicit origins instead of '*'")

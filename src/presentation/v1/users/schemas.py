@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Self
 
 from pydantic import EmailStr, Field, field_validator
 
@@ -53,7 +54,7 @@ class UserResponse(BaseSchema):
     )
 
     @classmethod
-    def from_entity(cls, user: UserEntity) -> "UserResponse":
+    def from_entity(cls, user: UserEntity) -> Self:
         """Преобразует доменную сущность в ответ API."""
         if user.id is None:
             raise ValueError("Persisted user must have an id")

@@ -55,7 +55,7 @@ def app(user_repository, session_repository, rate_limiter):
         parallelism=1,
     )
 
-    async def override_uow() -> AsyncGenerator[InMemoryUnitOfWork, None]:
+    async def override_uow() -> AsyncGenerator[InMemoryUnitOfWork]:
         yield InMemoryUnitOfWork(user_repository)
 
     def override_session_repository() -> InMemorySessionRepository:
@@ -81,6 +81,6 @@ def app(user_repository, session_repository, rate_limiter):
 
 
 @pytest.fixture
-async def client(app) -> AsyncGenerator[AsyncClient, None]:
+async def client(app) -> AsyncGenerator[AsyncClient]:
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as test_client:
         yield test_client

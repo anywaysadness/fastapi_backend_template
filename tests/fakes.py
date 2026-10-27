@@ -1,3 +1,4 @@
+from typing import Self
 from uuid import UUID
 
 from src.domains.auth.entities import Session
@@ -31,7 +32,7 @@ class InMemoryUnitOfWork:
     def __init__(self, users: InMemoryUserRepository) -> None:
         self.users = users
 
-    async def __aenter__(self) -> "InMemoryUnitOfWork":
+    async def __aenter__(self) -> Self:
         return self
 
     async def __aexit__(self, exc_type, exc_value, traceback) -> None:
