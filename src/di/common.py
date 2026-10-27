@@ -2,7 +2,7 @@ from fastapi import Depends, Request
 from redis.asyncio import Redis
 
 from src.application.common.rate_limiter import RateLimiter
-from src.application.common.uow import UnitOfWork
+from src.domains.uow import UnitOfWork
 from src.infrastructure.database.unit_of_work import SqlAlchemyUnitOfWork
 from src.infrastructure.rate_limit import RedisRateLimiter
 

@@ -5,7 +5,7 @@ from src.domains.users.interfaces import UserRepositoryProtocol
 
 
 class UnitOfWork(Protocol):
-    """Порт транзакции и доступа к репозиториям."""
+    """Порт транзакции и доступа к инфраструктурным репозиториям."""
 
     @property
     def users(self) -> UserRepositoryProtocol:
@@ -22,7 +22,7 @@ class UnitOfWork(Protocol):
         exc_value: BaseException | None,
         traceback: TracebackType | None,
     ) -> None:
-        """Фиксирует изменения или откатывает их при ошибке."""
+        """Фиксирует транзакцию или откатывает её при ошибке."""
         ...
 
     async def commit(self) -> None:

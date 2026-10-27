@@ -1,3 +1,3 @@
-from src.domains.users.interfaces.user_repository import UserRepositoryProtocol
+from src.domains.users.interfaces.user_repository import UserRecord, UserRepositoryProtocol
 
-__all__ = ["UserRepositoryProtocol"]
+__all__ = ["UserRecord", "UserRepositoryProtocol"]

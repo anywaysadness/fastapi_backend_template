@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from typing import Any, Self
+from typing import Self
 
 from src.domains.users.value_objects import EmailVO, UsernameVO
 
@@ -68,31 +68,3 @@ class UserEntity:
     def _touch(self) -> None:
         """Обновляет дату изменения."""
         self.updated_at = datetime.now(tz=UTC)
-
-    def to_persistence(self) -> dict[str, Any]:
-        """Возвращает whitelist-представление для сохранения в БД."""
-        return {
-            "id": self.id,
-            "username": self.username.value,
-            "hashed_password": self.hashed_password,
-            "created_at": self.created_at,
-            "updated_at": self.updated_at,
-            "email": self.email.value if self.email else None,
-            "is_active": self.is_active,
-            "is_admin": self.is_admin,
-        }
-
-    @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> Self:
-        """Восстанавливает сущность из строки БД."""
-        email_raw = data.get("email")
-        return cls(
-            id=data.get("id"),
-            username=UsernameVO(data["username"]),
-            hashed_password=data["hashed_password"],
-            created_at=data.get("created_at") or datetime.now(tz=UTC),
-            updated_at=data.get("updated_at"),
-            email=EmailVO(email_raw) if email_raw is not None else None,
-            is_active=data.get("is_active", True),
-            is_admin=data.get("is_admin", False),
-        )

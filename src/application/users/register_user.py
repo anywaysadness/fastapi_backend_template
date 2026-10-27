@@ -1,12 +1,13 @@
 from src.application.common.exceptions import RateLimitExceededError
 from src.application.common.rate_limiter import RateLimiter
-from src.application.common.uow import UnitOfWork
 from src.application.users.dto import RegisterUserCommand
 from src.common.password_policy import missing_password_requirements
 from src.domains.auth.exceptions import UserAlreadyExistsException, WeakPasswordError
 from src.domains.auth.interfaces import PasswordHasher
 from src.domains.auth.value_objects import PasswordVO, UsernameVO
+from src.domains.uow import UnitOfWork
 from src.domains.users.entities import UserEntity
+from src.domains.users.services import UserService
 
 
 class RegisterUserUseCase:
@@ -15,6 +16,7 @@ class RegisterUserUseCase:
     def __init__(
         self,
         uow: UnitOfWork,
+        user_service: UserService,
         password_hasher: PasswordHasher,
         rate_limiter: RateLimiter,
         max_attempts: int,
@@ -22,6 +24,7 @@ class RegisterUserUseCase:
     ) -> None:
         """Сохраняет зависимости сценария."""
         self._uow = uow
+        self._user_service = user_service
         self._password_hasher = password_hasher
         self._rate_limiter = rate_limiter
         self._max_attempts = max_attempts
@@ -45,9 +48,9 @@ class RegisterUserUseCase:
 
         hashed_password = self._password_hasher.hash(password.value)
         async with self._uow:
-            existing = await self._uow.users.find_by_username(username)
+            existing = await self._user_service.find_by_username(username)
             if existing is not None:
                 raise UserAlreadyExistsException(username=username.value)
 
             user = UserEntity.create(username=username, hashed_password=hashed_password)
-            return await self._uow.users.save(user)
+            return await self._user_service.save(user)

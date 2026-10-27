@@ -1,14 +1,15 @@
 from datetime import UTC, datetime, timedelta
-from uuid import UUID
 
 from src.application.auth.dto import LoginCommand, LoginResult
 from src.application.common.exceptions import RateLimitExceededError
 from src.application.common.rate_limiter import RateLimiter
-from src.application.common.uow import UnitOfWork
 from src.domains.auth.auth_service import AuthService
 from src.domains.auth.entities import Session
-from src.domains.auth.interfaces import SessionRepository, TokenService
+from src.domains.auth.interfaces import TokenService
+from src.domains.auth.services import SessionService
 from src.domains.auth.value_objects import PasswordVO, UsernameVO
+from src.domains.uow import UnitOfWork
+from src.domains.users.services import UserService
 
 
 class LoginUserUseCase:
@@ -19,7 +20,8 @@ class LoginUserUseCase:
         uow: UnitOfWork,
         auth_service: AuthService,
         token_service: TokenService,
-        session_repository: SessionRepository,
+        user_service: UserService,
+        session_service: SessionService,
         rate_limiter: RateLimiter,
         max_attempts: int,
         window_seconds: int,
@@ -28,7 +30,8 @@ class LoginUserUseCase:
         self._uow = uow
         self._auth_service = auth_service
         self._token_service = token_service
-        self._session_repository = session_repository
+        self._user_service = user_service
+        self._session_service = session_service
         self._rate_limiter = rate_limiter
         self._max_attempts = max_attempts
         self._window_seconds = window_seconds
@@ -48,7 +51,7 @@ class LoginUserUseCase:
             raise RateLimitExceededError()
 
         async with self._uow:
-            user = await self._uow.users.find_by_username(username)
+            user = await self._user_service.find_by_username(username)
 
         user = self._auth_service.verify_credentials(user, password)
         if user.id is None:
@@ -61,7 +64,7 @@ class LoginUserUseCase:
             ip_address=command.ip_address,
             user_agent=command.user_agent,
         )
-        await self._session_repository.save(session)
+        await self._session_service.save(session)
 
         access_token = self._token_service.create_access_token(user.id, session.id)
         return LoginResult(user=user, access_token=access_token, expires_in=expires_in)

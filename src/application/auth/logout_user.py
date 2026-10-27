@@ -1,16 +1,17 @@
 from uuid import UUID
 
 from src.common.base_exception import BaseDomainException
-from src.domains.auth.interfaces import SessionRepository, TokenService
+from src.domains.auth.interfaces import TokenService
+from src.domains.auth.services import SessionService
 
 
 class LogoutUserUseCase:
     """Сценарий выхода пользователя."""
 
-    def __init__(self, token_service: TokenService, session_repository: SessionRepository) -> None:
+    def __init__(self, token_service: TokenService, session_service: SessionService) -> None:
         """Сохраняет зависимости сценария."""
         self._token_service = token_service
-        self._session_repository = session_repository
+        self._session_service = session_service
 
     async def execute(self, token: str | None) -> None:
         """Отзывает текущую серверную сессию, если токен валиден."""
@@ -24,4 +25,4 @@ class LogoutUserUseCase:
         except (BaseDomainException, KeyError, TypeError, ValueError):
             return
 
-        await self._session_repository.revoke_by_id(session_id)
+        await self._session_service.revoke_by_id(session_id)

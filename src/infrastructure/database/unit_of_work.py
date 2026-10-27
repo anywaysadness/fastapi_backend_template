@@ -31,11 +31,11 @@ class SqlAlchemyUnitOfWork:
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
-        """Фиксирует изменения или откатывает транзакцию."""
+        """Фиксирует транзакцию или откатывает её при ошибке."""
         try:
             if exc_type is not None:
                 await self.rollback()
-            elif self._session is not None and self._session.info.get("uow_dirty"):
+            else:
                 await self.commit()
         finally:
             if self._session is not None:

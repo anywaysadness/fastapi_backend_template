@@ -13,13 +13,16 @@ from src.application.auth import (
     LogoutUserUseCase,
 )
 from src.application.common.rate_limiter import RateLimiter
-from src.application.common.uow import UnitOfWork
 from src.common.configuration import conf
 from src.di.common import get_rate_limiter, get_redis_client, get_uow
+from src.di.services import get_user_service
 from src.domains.auth.auth_service import AuthService
 from src.domains.auth.exceptions import ForbiddenError, NotAuthorizedError
 from src.domains.auth.interfaces import PasswordHasher, SessionRepository, TokenService
+from src.domains.auth.services import SessionService
+from src.domains.uow import UnitOfWork
 from src.domains.users.entities import UserEntity
+from src.domains.users.services import UserService
 from src.infrastructure.auth import Argon2PasswordHasher, JwtService, RedisSessionRepository
 
 auth_cookie_scheme = APIKeyCookie(
@@ -65,11 +68,19 @@ def get_session_repository(redis_client: Redis = Depends(get_redis_client)) -> S
     return RedisSessionRepository(redis_client)
 
 
+def get_session_service(
+    session_repository: SessionRepository = Depends(get_session_repository),
+) -> SessionService:
+    """Собирает сервис сессий для текущего запроса."""
+    return SessionService(repository=session_repository)
+
+
 def get_login_use_case(
     uow: UnitOfWork = Depends(get_uow),
     auth_service: AuthService = Depends(get_auth_service),
     token_service: TokenService = Depends(get_token_service),
-    session_repository: SessionRepository = Depends(get_session_repository),
+    user_service: UserService = Depends(get_user_service),
+    session_service: SessionService = Depends(get_session_service),
     rate_limiter: RateLimiter = Depends(get_rate_limiter),
 ) -> LoginUserUseCase:
     """Собирает use case входа."""
@@ -77,7 +88,8 @@ def get_login_use_case(
         uow=uow,
         auth_service=auth_service,
         token_service=token_service,
-        session_repository=session_repository,
+        user_service=user_service,
+        session_service=session_service,
         rate_limiter=rate_limiter,
         max_attempts=conf.rate_limit.LOGIN_ATTEMPTS,
         window_seconds=conf.rate_limit.LOGIN_WINDOW_SECONDS,
@@ -86,25 +98,27 @@ def get_login_use_case(
 
 def get_logout_use_case(
     token_service: TokenService = Depends(get_token_service),
-    session_repository: SessionRepository = Depends(get_session_repository),
+    session_service: SessionService = Depends(get_session_service),
 ) -> LogoutUserUseCase:
     """Собирает use case выхода."""
     return LogoutUserUseCase(
         token_service=token_service,
-        session_repository=session_repository,
+        session_service=session_service,
     )
 
 
 def get_current_user_use_case(
     uow: UnitOfWork = Depends(get_uow),
     token_service: TokenService = Depends(get_token_service),
-    session_repository: SessionRepository = Depends(get_session_repository),
+    user_service: UserService = Depends(get_user_service),
+    session_service: SessionService = Depends(get_session_service),
 ) -> GetCurrentUserUseCase:
     """Собирает use case получения текущего пользователя."""
     return GetCurrentUserUseCase(
         uow=uow,
         token_service=token_service,
-        session_repository=session_repository,
+        user_service=user_service,
+        session_service=session_service,
     )
 
 
@@ -131,25 +145,29 @@ def get_change_password_use_case(
     uow: UnitOfWork = Depends(get_uow),
     auth_service: AuthService = Depends(get_auth_service),
     password_hasher: PasswordHasher = Depends(get_password_hasher),
-    session_repository: SessionRepository = Depends(get_session_repository),
+    user_service: UserService = Depends(get_user_service),
+    session_service: SessionService = Depends(get_session_service),
 ) -> ChangePasswordUseCase:
     """Собирает use case смены пароля."""
     return ChangePasswordUseCase(
         uow=uow,
         auth_service=auth_service,
         password_hasher=password_hasher,
-        session_repository=session_repository,
+        user_service=user_service,
+        session_service=session_service,
     )
 
 
 def get_deactivate_account_use_case(
     uow: UnitOfWork = Depends(get_uow),
     auth_service: AuthService = Depends(get_auth_service),
-    session_repository: SessionRepository = Depends(get_session_repository),
+    user_service: UserService = Depends(get_user_service),
+    session_service: SessionService = Depends(get_session_service),
 ) -> DeactivateAccountUseCase:
     """Собирает use case деактивации аккаунта."""
     return DeactivateAccountUseCase(
         uow=uow,
         auth_service=auth_service,
-        session_repository=session_repository,
+        user_service=user_service,
+        session_service=session_service,
     )

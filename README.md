@@ -54,10 +54,10 @@ Swagger содержит описания эндпоинтов, схем, код
 .
 ├── migrations/                 # async Alembic
 ├── src/
-│   ├── application/            # use cases, DTO, UnitOfWork protocol
+│   ├── application/            # use cases и DTO
 │   ├── common/                 # конфигурация, исключения, логирование
 │   ├── di/                     # единый composition root
-│   ├── domains/                # entities, value objects, protocols
+│   ├── domains/                # entities, value objects, ports, сервисы и UnitOfWork
 │   ├── infrastructure/         # SQLAlchemy, Redis, JWT, Argon2
 │   ├── presentation/           # FastAPI-роутеры и Pydantic-схемы
 │   ├── main.py                 # создание приложения и lifespan

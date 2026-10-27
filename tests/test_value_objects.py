@@ -4,9 +4,11 @@ import pytest
 
 from src.domains.auth.entities import Session
 from src.domains.auth.exceptions import InvalidPasswordError
+from src.domains.auth.services import SessionService
 from src.domains.auth.value_objects import PasswordVO
 from src.domains.users.exceptions import InvalidEmailError, InvalidUsernameError
 from src.domains.users.value_objects import EmailVO, UsernameVO
+from tests.fakes import InMemorySessionRepository
 
 
 def test_username_is_normalized() -> None:
@@ -37,6 +39,7 @@ def test_password_limits() -> None:
 
 
 def test_session_validity_and_revocation() -> None:
+    service = SessionService(InMemorySessionRepository())
     session = Session.create(
         user_id=1,
         expires_at=datetime.now(UTC) + timedelta(minutes=5),
@@ -48,14 +51,16 @@ def test_session_validity_and_revocation() -> None:
     session.revoke()
     assert not session.is_valid()
 
-    restored = Session.from_dict(session.to_dict())
+    restored = service.to_entity(service.to_persistence(session))
     assert not restored.is_valid()
     assert (
-        Session.from_dict(
-            Session.create(
-                user_id=1,
-                expires_at=datetime.now(UTC) - timedelta(seconds=1),
-            ).to_dict()
+        service.to_entity(
+            service.to_persistence(
+                Session.create(
+                    user_id=1,
+                    expires_at=datetime.now(UTC) - timedelta(seconds=1),
+                )
+            )
         ).is_valid()
         is False
     )
