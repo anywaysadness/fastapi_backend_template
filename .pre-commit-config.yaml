@@ -18,7 +18,15 @@ repos:
       - id: mypy
         name: mypy
         description: "Type-check the project"
-        entry: poetry run mypy src tests
+        entry: poetry run mypy
         language: system
         types_or: [python]
         pass_filenames: false
+
+      - id: pytest
+        name: run tests with pytest
+        entry: poetry run pytest
+        language: system
+        pass_filenames: false
+        always_run: true
+        types_or: [python]
