@@ -83,6 +83,21 @@ line-ending = "auto"
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 
+[tool.mypy]
+# Какие каталоги проверять по умолчанию
+files = ["src", "tests"]
+# Под какую версию Python проверять типы
+python_version = "3.14"
+# Проверять даже тела функций без полной типизации
+check_untyped_defs = true
+# Показывать коды ошибок рядом с сообщениями
+show_error_codes = true
+# Предупреждать о лишних type: ignore
+warn_unused_ignores = true
+# Не падать на внешних библиотеках без type stubs
+ignore_missing_imports = true
+plugins = ["pydantic.mypy"]
+
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]

@@ -135,10 +135,10 @@ class Configuration:
     def __init__(self) -> None:
         """Загружает настройки из окружения и проверяет production-секреты."""
         self.app = AppConfig()
-        self.jwt_auth = JWTAuthConfig()  # type: ignore[call-arg]
+        self.jwt_auth = JWTAuthConfig()
         self.password = PasswordConfig()
         self.rate_limit = RateLimitConfig()
-        self.postgres = PostgresConfig()  # type: ignore[call-arg]
+        self.postgres = PostgresConfig()
         self.redis = RedisConfig()
         self._validate_production_secrets()
 
